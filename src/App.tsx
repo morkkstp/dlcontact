@@ -64,7 +64,6 @@ const App: React.FC = () => {
       // สำหรับ Android บางตัวที่ไม่รองรับการดาวน์โหลดไฟล์โดยตรง
       const reader = new FileReader();
       reader.onload = () => {
-        const dataUrl = reader.result as string;
         // เปิดไฟล์ vCard โดยตรง
         const vCardDataUrl = `data:text/vcard;charset=utf-8,${encodeURIComponent(
           vCard
