@@ -36,36 +36,52 @@ const App: React.FC = () => {
     }
 
     const vCard = `
-BEGIN:VCARD
-VERSION:3.0
-FN:${data.name}
-TEL:${data.phone}
-EMAIL:${data.email}
-ADR:${data.address}
-PHOTO;ENCODING=BASE64:${
-      base64Image.split(",")[1]
-    }  // แยกส่วน Base64 ที่ต้องการ
-END:VCARD
+  BEGIN:VCARD
+  VERSION:3.0
+  FN:${data.name}
+  TEL:${data.phone}
+  EMAIL:${data.email}
+  ADR:${data.address}
+  PHOTO;ENCODING=BASE64:${
+    base64Image.split(",")[1]
+  }  // แยกส่วน Base64 ที่ต้องการ
+  END:VCARD
     `.trim();
 
     const blob = new Blob([vCard], { type: "text/vcard" });
 
-    // สร้างลิงค์ดาวน์โหลด
-    const link = document.createElement("a");
-    if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
-      // สำหรับ Internet Explorer
-      (window.navigator as any).msSaveOrOpenBlob(blob, "contact.vcf");
-    } else {
-      // สำหรับเบราว์เซอร์ที่รองรับ
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+
+    // การดาวน์โหลดที่แตกต่างกันสำหรับ iOS และ Android
+    if (isIOS) {
+      // วิธีการดาวน์โหลดไฟล์สำหรับ iOS
+      const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.href = url;
       link.download = "contact.vcf";
-
-      // ตรวจสอบว่าเบราว์เซอร์รองรับการคลิก
       link.click();
-
-      // ทำความสะอาดหลังจากการดาวน์โหลด
       URL.revokeObjectURL(url);
+    } else if (isAndroid) {
+      // วิธีการดาวน์โหลดไฟล์สำหรับ Android
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = "contact.vcf";
+      link.click();
+      URL.revokeObjectURL(url);
+    } else {
+      // สำหรับเบราว์เซอร์ทั่วไป
+      if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
+        (window.navigator as any).msSaveOrOpenBlob(blob, "contact.vcf");
+      } else {
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = "contact.vcf";
+        link.click();
+        URL.revokeObjectURL(url);
+      }
     }
   };
 
