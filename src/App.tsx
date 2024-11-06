@@ -36,37 +36,49 @@ const App: React.FC = () => {
     }
 
     const vCard = `
-BEGIN:VCARD
-VERSION:3.0
-FN:${data.name}
-TEL:${data.phone}
-EMAIL:${data.email}
-ADR:${data.address}
-PHOTO;ENCODING=BASE64:${
-      base64Image.split(",")[1]
-    }  // แยกส่วน Base64 ที่ต้องการ
-END:VCARD
+  BEGIN:VCARD
+  VERSION:3.0
+  FN:${data.name}
+  TEL:${data.phone}
+  EMAIL:${data.email}
+  ADR:${data.address}
+  PHOTO;ENCODING=BASE64:${
+    base64Image.split(",")[1]
+  }  // แยกส่วน Base64 ที่ต้องการ
+  END:VCARD
     `.trim();
 
     const blob = new Blob([vCard], { type: "text/vcard" });
 
     // สร้างลิงค์ดาวน์โหลด
     const link = document.createElement("a");
-    if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
-      // สำหรับ Internet Explorer
-      (window.navigator as any).msSaveOrOpenBlob(blob, "contact.vcf");
-    } else {
-      // สำหรับเบราว์เซอร์ที่รองรับ
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = "contact.vcf";
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = "contact.vcf";
 
-      // ตรวจสอบว่าเบราว์เซอร์รองรับการคลิก
+    // ตรวจสอบการรองรับการดาวน์โหลด
+    if (link.download !== undefined) {
+      // สำหรับเบราว์เซอร์ที่รองรับการดาวน์โหลดโดยตรง
       link.click();
-
-      // ทำความสะอาดหลังจากการดาวน์โหลด
-      URL.revokeObjectURL(url);
+    } else {
+      // สำหรับ Android บางตัวที่ไม่รองรับการดาวน์โหลดไฟล์โดยตรง
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        // เปิดไฟล์ vCard โดยตรง
+        const vCardDataUrl = `data:text/vcard;charset=utf-8,${encodeURIComponent(
+          vCard
+        )}`;
+        const a = document.createElement("a");
+        a.href = vCardDataUrl;
+        a.download = "contact.vcf";
+        a.click();
+      };
+      reader.readAsDataURL(blob);
     }
+
+    // ทำความสะอาดหลังจากการดาวน์โหลด
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
