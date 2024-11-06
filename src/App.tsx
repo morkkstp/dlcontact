@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Kasi from "../src/assets/kasi.jpg"; // รูปภาพที่ต้องการแปลง
+// import Kasi from "../src/assets/kasi.jpg"; // รูปภาพที่ต้องการแปลง
 
 const App: React.FC = () => {
   const [base64Image, setBase64Image] = useState<string | null>(null);
@@ -11,30 +11,25 @@ const App: React.FC = () => {
     address: "Nakkon Si Thammarat, Thailand",
   };
 
-  // ฟังก์ชันแปลงรูปภาพเป็น Base64
-  const loadImageAsBase64 = () => {
-    const img = new Image();
-    img.src = Kasi; // ระบุ path ของรูปภาพ
+  // ฟังก์ชันแปลงรูปภาพเป็น Base64 (ปิดใช้งานชั่วคราว)
+  // const loadImageAsBase64 = () => {
+  //   const img = new Image();
+  //   img.src = Kasi; // ระบุ path ของรูปภาพ
 
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        const base64 = canvas.toDataURL("image/jpeg");
-        setBase64Image(base64); // บันทึก Base64 ของรูปภาพ
-      }
-    };
-  };
+  //   img.onload = () => {
+  //     const canvas = document.createElement("canvas");
+  //     const ctx = canvas.getContext("2d");
+  //     if (ctx) {
+  //       canvas.width = img.width;
+  //       canvas.height = img.height;
+  //       ctx.drawImage(img, 0, 0);
+  //       const base64 = canvas.toDataURL("image/jpeg");
+  //       setBase64Image(base64); // บันทึก Base64 ของรูปภาพ
+  //     }
+  //   };
+  // };
 
   const handleDownload = () => {
-    if (!base64Image) {
-      alert("กรุณารอให้รูปภาพโหลดเสร็จแล้ว");
-      return;
-    }
-
     const vCard = `
   BEGIN:VCARD
   VERSION:3.0
@@ -42,8 +37,8 @@ const App: React.FC = () => {
   TEL:${data.phone}
   EMAIL:${data.email}
   ADR:${data.address}
-  PHOTO;ENCODING=BASE64:${
-    base64Image.split(",")[1]
+  // PHOTO;ENCODING=BASE64:${
+    base64Image ? base64Image.split(",")[1] : ""
   }  // แยกส่วน Base64 ที่ต้องการ
   END:VCARD
     `.trim();
@@ -55,7 +50,6 @@ const App: React.FC = () => {
 
     // การดาวน์โหลดที่แตกต่างกันสำหรับ iOS และ Android
     if (isIOS) {
-      // วิธีการดาวน์โหลดไฟล์สำหรับ iOS
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.href = url;
@@ -63,7 +57,6 @@ const App: React.FC = () => {
       link.click();
       URL.revokeObjectURL(url);
     } else if (isAndroid) {
-      // วิธีการดาวน์โหลดไฟล์สำหรับ Android
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.href = url;
@@ -71,7 +64,6 @@ const App: React.FC = () => {
       link.click();
       URL.revokeObjectURL(url);
     } else {
-      // สำหรับเบราว์เซอร์ทั่วไป
       if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
         (window.navigator as any).msSaveOrOpenBlob(blob, "contact.vcf");
       } else {
@@ -85,9 +77,9 @@ const App: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    loadImageAsBase64();
-  }, []);
+  // useEffect(() => {
+  //   loadImageAsBase64();
+  // }, []);
 
   return (
     <button
