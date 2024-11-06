@@ -48,28 +48,25 @@ PHOTO;ENCODING=BASE64:${
 END:VCARD
     `.trim();
 
-    const blob = new Blob([vCard], { type: "text/x-vcard" });
+    const blob = new Blob([vCard], { type: "text/vcard" });
 
+    // สร้างลิงค์ดาวน์โหลด
     const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.download = "contact.vcf";
-
-    // ตรวจสอบการรองรับการดาวน์โหลด
-    if (link.download !== undefined) {
-      // สำหรับเบราว์เซอร์ที่รองรับการดาวน์โหลดโดยตรง
-      link.click();
+    if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
+      // สำหรับ Internet Explorer
+      (window.navigator as any).msSaveOrOpenBlob(blob, "contact.vcf");
     } else {
-      // สำหรับบางกรณีที่ Android ไม่รองรับ
-      const vCardDataUrl = `data:text/x-vcard;charset=utf-8,${encodeURIComponent(vCard)}`;
-      const a = document.createElement("a");
-      a.href = vCardDataUrl;
-      a.download = "contact.vcf";
-      a.click();
-    }
+      // สำหรับเบราว์เซอร์ที่รองรับ
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = "contact.vcf";
 
-    // ทำความสะอาดหลังจากการดาวน์โหลด
-    URL.revokeObjectURL(url);
+      // ตรวจสอบว่าเบราว์เซอร์รองรับการคลิก
+      link.click();
+
+      // ทำความสะอาดหลังจากการดาวน์โหลด
+      URL.revokeObjectURL(url);
+    }
   };
 
   useEffect(() => {
