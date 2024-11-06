@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Kasi from "../src/assets/kasi.jpg"; // รูปภาพที่ต้องการแปลง
+import Kasi from "../src/assets/kasi.jpg"; // Path to the image you want to convert
 
 const App: React.FC = () => {
   const [base64Image, setBase64Image] = useState<string | null>(null);
@@ -11,10 +11,10 @@ const App: React.FC = () => {
     address: "Nakkon Si Thammarat, Thailand",
   };
 
-  // ฟังก์ชันแปลงรูปภาพเป็น Base64
+  // Function to convert image to Base64
   const loadImageAsBase64 = () => {
     const img = new Image();
-    img.src = Kasi; // ระบุ path ของรูปภาพ
+    img.src = Kasi; // Path to the image
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
@@ -24,8 +24,12 @@ const App: React.FC = () => {
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
         const base64 = canvas.toDataURL("image/jpeg");
-        setBase64Image(base64); // บันทึก Base64 ของรูปภาพ
+        setBase64Image(base64); // Save the Base64 of the image
       }
+    };
+
+    img.onerror = () => {
+      console.error("Error loading image");
     };
   };
 
@@ -42,9 +46,7 @@ const App: React.FC = () => {
   TEL:${data.phone}
   EMAIL:${data.email}
   ADR:${data.address}
-  PHOTO;ENCODING=BASE64:${
-    base64Image.split(",")[1]
-  }  // แยกส่วน Base64 ที่ต้องการ
+  PHOTO;ENCODING=BASE64:${base64Image.split(",")[1]}  // Extract only the base64 part
   END:VCARD
     `.trim();
 
@@ -53,17 +55,8 @@ const App: React.FC = () => {
     const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
     const isAndroid = /Android/.test(navigator.userAgent);
 
-    // การดาวน์โหลดที่แตกต่างกันสำหรับ iOS และ Android
-    if (isIOS) {
-      // วิธีการดาวน์โหลดไฟล์สำหรับ iOS
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = "contact.vcf";
-      link.click();
-      URL.revokeObjectURL(url);
-    } else if (isAndroid) {
-      // วิธีการดาวน์โหลดไฟล์สำหรับ Android
+    // Different download methods for iOS and Android
+    if (isIOS || isAndroid) {
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.href = url;
@@ -71,7 +64,7 @@ const App: React.FC = () => {
       link.click();
       URL.revokeObjectURL(url);
     } else {
-      // สำหรับเบราว์เซอร์ทั่วไป
+      // For desktop browsers
       if (window.navigator && (window.navigator as any).msSaveOrOpenBlob) {
         (window.navigator as any).msSaveOrOpenBlob(blob, "contact.vcf");
       } else {
