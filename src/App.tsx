@@ -1,6 +1,8 @@
-
+import React, { useState, useEffect } from "react";
+import Kasi from "../src/assets/kasi.jpg"; // รูปภาพที่ต้องการใช้เป็น URL
 
 const App: React.FC = () => {
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   const data = {
     name: "Kasidit Boonchai",
@@ -9,7 +11,17 @@ const App: React.FC = () => {
     address: "Nakkon Si Thammarat, Thailand",
   };
 
+  // ฟังก์ชันแปลงรูปภาพเป็น URL
+  const loadImageUrl = () => {
+    // ใช้ URL ของรูปภาพในโปรเจกต์
+    setImageUrl(Kasi); // กำหนด URL ของรูปภาพ
+  };
+
   const handleDownload = () => {
+    if (!imageUrl) {
+      alert("กรุณารอให้รูปภาพโหลดเสร็จแล้ว");
+      return;
+    }
 
     const vCard = `
 BEGIN:VCARD
@@ -18,8 +30,10 @@ FN:${data.name}
 TEL:${data.phone}
 EMAIL:${data.email}
 ADR:${data.address}
+PHOTO;TYPE=JPEG:${imageUrl}  // ใช้ URL ของรูปภาพ
 END:VCARD
     `.trim();
+
     const blob = new Blob([vCard], { type: "text/vcard" });
     // สร้างลิงค์ดาวน์โหลด
     const link = document.createElement("a");
@@ -38,6 +52,10 @@ END:VCARD
     }
   };
 
+  useEffect(() => {
+    loadImageUrl();
+  }, []);
+
   return (
     <button
       onClick={handleDownload}
@@ -47,4 +65,5 @@ END:VCARD
     </button>
   );
 };
+
 export default App;
