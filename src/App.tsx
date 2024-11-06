@@ -42,6 +42,9 @@ const App: React.FC = () => {
   TEL:${data.phone}
   EMAIL:${data.email}
   ADR:${data.address}
+  PHOTO;ENCODING=BASE64:${
+    base64Image.split(",")[1]
+  }  // แยกส่วน Base64 ที่ต้องการ
   END:VCARD
     `.trim();
 
