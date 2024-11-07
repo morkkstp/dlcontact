@@ -6,9 +6,11 @@ const App: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
 
   const data = {
-    name: "Kasidit Boonchai",
+    fname: "Kasidit",
+    lname: "Boonchai",
     email: "kasidit.bc@gmail.com",
     phone: "084-699-5862",
+    companyName: 'SCG',
     address: "Nakkon Si Thammarat, Thailand",
   };
 
@@ -44,10 +46,10 @@ const App: React.FC = () => {
     const vCard = `
 BEGIN:VCARD
 VERSION:3.0
-FN:${data.name}
+FN:${data.fname} ${data.lname} 
 TEL:${data.phone}
 EMAIL:${data.email}
-ADR:${data.address}
+ADR:${data.companyName} ${data.address}
 ${base64Image ? `PHOTO;ENCODING=BASE64:${base64Image.split(",")[1]}` : `PHOTO;TYPE=JPEG:${imageUrl}`} 
 END:VCARD
     `.trim();
